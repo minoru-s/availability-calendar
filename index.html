@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f7f2">
+  <meta name="description" content="午前・午後・夜ごとの空き状況。">
+  <title>空き状況</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./data.js" defer></script>
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <main class="site-shell">
+    <header class="compact-header">
+      <div><h1>空き状況</h1><p class="range-label" id="range-label"></p></div>
+      <span class="updated-at" id="updated-at"></span>
+    </header>
+    <div class="review-notice" id="review-notice" role="note" hidden><span class="notice-dot" aria-hidden="true"></span><p><strong>公開前の確認用です。</strong>空き状況は下案です。</p></div>
+    <div class="calendar-toolbar">
+      <div class="legend" aria-label="記号の意味"><span><b class="symbol available">○</b> 空き</span><span><b class="symbol tentative">△</b> 調整中</span><span><b class="symbol busy">×</b> 予定あり</span></div>
+      <p class="time-note">午前 9–12時 · 午後 13–18時 · 夜 18–21時</p>
+    </div>
+    <div id="months" class="months"></div>
+    <p class="bottom-note">○・△を選ぶと候補をコピーできます。空き状況は変わる場合があります。</p>
+  </main>
+  <div class="selection-bar" id="selection-bar" hidden><div><strong id="selection-count">0件選択中</strong></div><div class="selection-actions"><button type="button" class="clear-button" id="clear-selection">解除</button><button type="button" class="copy-button" id="copy-selection">候補をコピー <span aria-hidden="true">↗</span></button></div></div>
+  <div class="sr-only" id="announcement" role="status" aria-live="polite"></div>
+</body>
+</html>
