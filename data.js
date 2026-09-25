@@ -14,7 +14,7 @@ window.availabilityData = {
     "2026-09-28": { am: "busy", pm: "busy" },
     "2026-09-29": { am: "busy", pm: "busy", night: "busy" },
     "2026-09-30": { pm: "busy" },
-    "2026-10-11": { am: "busy", pm: "busy" },
+    "2026-10-11": { am: "tentative", pm: "busy" },
     "2026-10-14": { am: "tentative" },
     "2026-10-16": { am: "busy" }
   }
