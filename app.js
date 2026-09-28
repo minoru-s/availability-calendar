@@ -4,7 +4,6 @@
   let data = window.availabilityData;
   let apiDays = null;
   let rangeOffset = 0;
-  let rangeAnchor = null;
   const parts = ["am", "pm", "night"];
   const partLabels = { am: "午前", pm: "午後", night: "夜" };
   const statusLabels = { available: "空き", tentative: "調整中", busy: "予定あり" };
@@ -67,7 +66,7 @@
   async function goToToday() {
     closeHelp();
     let target = refreshToday();
-    if (!target && apiBase) { rangeOffset = 0; rangeAnchor = null; await loadRange(); target = refreshToday(); }
+    if (!target && apiBase) { rangeOffset = 0; await loadRange(); target = refreshToday(); }
     if (!target) return;
     const topInset = parseFloat(getComputedStyle(toolbar).top) || 0;
     const offset = toolbar.getBoundingClientRect().height + topInset + 16;
@@ -206,7 +205,7 @@
   function plus(iso, count) { return isoOf(new Date(dateOf(iso).getTime() + count * 86400000)); }
   async function loadRange() {
     const sequence = ++loadSequence;
-    const from = plus(rangeAnchor || todayInJapan(), rangeOffset * 28), to = plus(from, 55);
+    const from = plus(todayInJapan(), rangeOffset * 28), to = plus(from, 55);
     const notice = document.getElementById("load-status");
     notice.hidden = false; notice.textContent = "空き状況を読み込んでいます…";
     try {
@@ -223,7 +222,6 @@
         else if (apiDays.has(day)) selectedStatuses.set(key, statusOf(day, part));
       }
       updateSelection();
-      document.getElementById("visible-range").textContent = labelOf(from) + "〜" + labelOf(to);
       document.getElementById("updated-at").textContent = result.publishedAt ? "最終公開 " + new Date(result.publishedAt).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" }) : result.legacyCheckedAt ? "移行前の最終確認 " + labelOf(result.legacyCheckedAt) : "移行した公開データ";
       notice.hidden = true;
     } catch {
@@ -242,10 +240,6 @@
     document.getElementById("range-nav").hidden = false;
     document.getElementById("previous-range").addEventListener("click", () => { rangeOffset--; loadRange(); });
     document.getElementById("next-range").addEventListener("click", () => { rangeOffset++; loadRange(); });
-    document.getElementById("reset-range").addEventListener("click", () => { rangeOffset = 0; rangeAnchor = null; loadRange(); });
-    document.getElementById("jump-month").addEventListener("change", event => {
-      if (/^\d{4}-\d{2}$/.test(event.target.value)) { rangeAnchor = event.target.value + "-01"; rangeOffset = 0; loadRange(); }
-    });
     loadRange();
   } else {
     renderDates(data.start, data.end);

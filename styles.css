@@ -182,10 +182,8 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--blue);outline-offse
   .calendar-toolbar::before,.selection-bar::before,.calendar-help::before{display:none}
 }
 @media(prefers-contrast:more){:root{--material-border:var(--secondary);--material-border-bottom:var(--secondary)}}
-.range-nav{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:-8px 0 20px}
+.range-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:-8px 0 20px}
 .range-nav button,.load-status button{min-height:44px;padding:8px 13px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--blue);font-weight:600;cursor:pointer}
-.range-nav span{margin:auto;color:var(--secondary);font-size:13px}
-.month-picker{display:inline-flex;align-items:center;gap:6px;color:var(--secondary);font-size:13px}.month-picker input{min-height:44px;max-width:150px;padding:7px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);font:inherit}
 .load-status{padding:18px;border-radius:18px;background:var(--surface);color:var(--secondary)}
 .location-label{grid-column:1/-1;margin:4px 0 0;color:var(--secondary);font-size:12px}
-@media(max-width:680px){.range-nav span{order:-1;width:100%;text-align:center}.location-label{width:100%;margin:0 0 0 52px}}
+@media(max-width:680px){.location-label{width:100%;margin:0 0 0 52px}}

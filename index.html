@@ -8,10 +8,10 @@
   <meta name="description" content="午前・午後・夜ごとの空き状況。">
   <title>空き状況</title>
   <link rel="icon" type="image/svg+xml" href="./favicon.svg">
-  <link rel="stylesheet" href="./styles.css?v=20260928-api-editor">
+  <link rel="stylesheet" href="./styles.css?v=20260928-simple-nav">
   <script src="./config.js" defer></script>
   <script src="./data.js?v=20260925-oct10-all" defer></script>
-  <script src="./app.js?v=20260928-api-editor" defer></script>
+  <script src="./app.js?v=20260928-simple-nav" defer></script>
 </head>
 <body>
   <main class="site-shell">
@@ -44,9 +44,6 @@
     </div>
     <nav class="range-nav" id="range-nav" aria-label="表示期間" hidden>
       <button type="button" id="previous-range">← 前の4週間</button>
-      <span id="visible-range"></span>
-      <label class="month-picker">年月へ移動 <input type="month" id="jump-month" aria-label="表示する年月"></label>
-      <button type="button" id="reset-range">今日から8週間</button>
       <button type="button" id="next-range">次の4週間 →</button>
     </nav>
     <p id="load-status" class="load-status" role="status" hidden></p>
