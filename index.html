@@ -3,13 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f7f7f2">
+  <meta name="theme-color" content="#f3f5f9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#101217" media="(prefers-color-scheme: dark)">
   <meta name="description" content="午前・午後・夜ごとの空き状況。">
   <title>空き状況</title>
   <link rel="icon" type="image/svg+xml" href="./favicon.svg">
-  <link rel="stylesheet" href="./styles.css?v=20260925-owner-layout">
+  <link rel="stylesheet" href="./styles.css?v=20260928-spacing-symbols">
+  <script src="./config.js" defer></script>
   <script src="./data.js?v=20260925-oct10-all" defer></script>
-  <script src="./app.js" defer></script>
+  <script src="./app.js?v=20260928-spacing-symbols" defer></script>
 </head>
 <body>
   <main class="site-shell">
@@ -18,20 +20,39 @@
         <img class="owner-avatar" src="https://avatars.githubusercontent.com/u/201198385?v=4" alt="" width="64" height="64" referrerpolicy="no-referrer">
       </a>
       <div class="header-content">
-        <div class="owner-row"><span>このカレンダーの持ち主</span><a href="https://github.com/minoru-s" target="_blank" rel="noopener noreferrer">Saito Minoru <span aria-hidden="true">↗</span></a></div>
+        <div class="owner-row"><a href="https://github.com/minoru-s" target="_blank" rel="noopener noreferrer" aria-label="カレンダーの持ち主 Saito Minoru の GitHub プロフィール">Saito Minoru <span aria-hidden="true">↗</span></a></div>
         <h1>空き状況</h1>
-        <div class="header-meta"><span class="range-label" id="range-label"></span><span class="updated-at" id="updated-at"></span></div>
+        <div class="header-meta"><span class="updated-at" id="updated-at"></span></div>
       </div>
     </header>
     <div class="review-notice" id="review-notice" role="note" hidden><span class="notice-dot" aria-hidden="true"></span><p><strong>公開前の確認用です。</strong>空き状況は下案です。</p></div>
     <div class="calendar-toolbar">
-      <div class="legend" aria-label="記号の意味"><span><b class="symbol available">○</b> 空き</span><span><b class="symbol tentative">△</b> 調整中</span><span><b class="symbol busy">×</b> 予定あり</span></div>
-      <p class="time-note">午前 9–12時 · 午後 13–18時 · 夜 18–21時</p>
+      <div class="legend" aria-label="記号の意味">
+        <span><b class="symbol available">○</b> 空き</span>
+        <span aria-label="△ 調整中"><b class="symbol tentative">△</b><span class="legend-full">調整中</span><span class="legend-short" aria-hidden="true">調整</span></span>
+        <span aria-label="× 予定あり"><b class="symbol busy">×</b><span class="legend-full">予定あり</span><span class="legend-short" aria-hidden="true">予定</span></span>
+      </div>
+      <div class="toolbar-actions">
+        <button class="today-button" id="go-today" type="button">今日</button>
+        <button class="help-button" id="toggle-help" type="button" aria-label="案内：使い方と時間帯" title="使い方と時間帯" aria-expanded="false" aria-controls="calendar-help"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 10.5v6"/><circle cx="12" cy="7.4" r=".9" fill="currentColor" stroke="none"/></svg></button>
+      </div>
+      <section class="calendar-help" id="calendar-help" aria-label="使い方と時間帯" hidden>
+        <div class="help-heading"><h2>カレンダーの見方</h2><button class="help-close" id="close-help" type="button" aria-label="案内を閉じる">×</button></div>
+        <p>○・△を選ぶと候補をコピーできます。<br>空き状況は変わる場合があります。</p>
+        <dl class="help-times"><div><dt>午前</dt><dd>9–12時</dd></div><div><dt>午後</dt><dd>13–18時</dd></div><div><dt>夜</dt><dd>18–21時</dd></div></dl>
+      </section>
     </div>
+    <nav class="range-nav" id="range-nav" aria-label="表示期間" hidden>
+      <button type="button" id="previous-range">← 前の4週間</button>
+      <span id="visible-range"></span>
+      <label class="month-picker">年月へ移動 <input type="month" id="jump-month" aria-label="表示する年月"></label>
+      <button type="button" id="reset-range">今日から8週間</button>
+      <button type="button" id="next-range">次の4週間 →</button>
+    </nav>
+    <p id="load-status" class="load-status" role="status" hidden></p>
     <div id="months" class="months"></div>
-    <p class="bottom-note">○・△を選ぶと候補をコピーできます。空き状況は変わる場合があります。</p>
   </main>
-  <div class="selection-bar" id="selection-bar" hidden><div><strong id="selection-count">0件選択中</strong></div><div class="selection-actions"><button type="button" class="clear-button" id="clear-selection">解除</button><button type="button" class="copy-button" id="copy-selection">候補をコピー <span aria-hidden="true">↗</span></button></div></div>
+  <div class="selection-bar" id="selection-bar" hidden><div><strong id="selection-count" aria-live="polite">0件選択中</strong></div><div class="selection-actions"><button type="button" class="clear-button" id="clear-selection">解除</button><button type="button" class="copy-button" id="copy-selection">候補をコピー <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="3"/><path d="M15 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg></button></div></div>
   <div class="sr-only" id="announcement" role="status" aria-live="polite"></div>
 </body>
 </html>

@@ -1,0 +1,15 @@
+{
+  "name": "availability-calendar-api",
+  "main": "./dist/index.js",
+  "compatibility_date": "2026-09-28",
+  "workers_dev": true,
+  "preview_urls": false,
+  "vars": {
+    "PUBLIC_ORIGIN": "https://minoru-s.github.io",
+    "GOOGLE_CLIENT_ID": "REPLACE_WITH_GOOGLE_OAUTH_WEB_CLIENT_ID",
+    "OWNER_EMAIL": "REPLACE_WITH_GOOGLE_EMAIL"
+  },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "availability-calendar", "database_id": "REPLACE_WITH_D1_ID" }
+  ]
+}

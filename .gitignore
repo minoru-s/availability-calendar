@@ -1,0 +1,6 @@
+node_modules/
+.wrangler/
+worker/dist/
+worker/wrangler.jsonc
+worker/seed.sql
+*.log

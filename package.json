@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-worker.mjs && node scripts/seed.mjs",
+    "dev": "npm run build && wrangler dev --config worker/wrangler.jsonc",
+    "deploy": "npm run build && wrangler deploy --config worker/wrangler.jsonc"
+  },
+  "devDependencies": { "wrangler": "^4.135.0" }
+}
