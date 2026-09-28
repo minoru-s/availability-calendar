@@ -186,4 +186,9 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--blue);outline-offse
 .range-nav button,.load-status button{min-height:44px;padding:8px 13px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--blue);font-weight:600;cursor:pointer}
 .load-status{padding:18px;border-radius:18px;background:var(--surface);color:var(--secondary)}
 .location-label{grid-column:1/-1;margin:4px 0 0;color:var(--secondary);font-size:12px}
-@media(max-width:680px){.location-label{width:100%;margin:0 0 0 52px}}
+@media(max-width:680px){
+  .day-card{display:grid;grid-template-columns:52px minmax(0,1fr);column-gap:14px;row-gap:4px;justify-content:initial}
+  .day-slots{min-width:0}
+  .location-label{grid-column:2;min-width:0;margin:0;overflow-wrap:anywhere}
+}
+@media(max-width:370px){.day-card{grid-template-columns:40px minmax(0,1fr);column-gap:8px}}
