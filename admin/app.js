@@ -1,7 +1,8 @@
 const app = document.getElementById("app");
 const PARTS = ["am", "pm", "night"];
-const LABELS = { am: "午前", pm: "午後", night: "夜", available: "○ 空き", tentative: "△ 調整中", busy: "× 不可", inherit: "個別指定を解除" };
-const MARKS = { available: "○", tentative: "△", busy: "×" };
+const LABELS = { am: "午前", pm: "午後", night: "夜", available: "○ 空き", tentative: "△ 調整中", busy: "× 不可", unreflected: "— 未反映", inherit: "個別指定を解除" };
+const MARKS = { available: "○", tentative: "△", busy: "×", unreflected: "—" };
+const UNREFLECTED_FROM = "2026-12-01";
 const WEEKDAYS = ["日", "月", "火", "水", "木", "金", "土"];
 let published, draft, version, publishedAt, canRestore;
 let mode = "busy", offset = 0, anchor = null, history = [], busy = false;
@@ -24,7 +25,7 @@ const allDates = (from, to) => {
 const validRange = (from, to) => /^\d{4}-\d{2}-\d{2}$/.test(from) && /^\d{4}-\d{2}-\d{2}$/.test(to) && to >= from && allDates(from, to).length <= 366;
 function status(data, day, part) {
   if (data.overrides[day]?.[part]) return data.overrides[day][part];
-  let value = "tentative";
+  let value = day >= UNREFLECTED_FROM ? "unreflected" : "tentative";
   const weekday = date(day).getUTCDay();
   for (const rule of data.rules) if (day >= rule.from && day <= rule.to && rule.weekdays.includes(weekday) && rule.parts.includes(part)) value = rule.status;
   return value;
@@ -101,7 +102,7 @@ function renderDays() {
 }
 function render() {
   app.innerHTML = `<header><div><p class="owner">Saito Minoru</p><h1>空き状況を編集</h1><p class="sub">公開中：<span id="published-at"></span></p></div><div class="header-links"><a href="https://minoru-s.github.io/availability-calendar/" target="_blank" rel="noopener">公開ページ ↗</a><button type="button" id="logout">ログアウト</button></div></header>
-    <div class="editor-bar"><div class="modes" role="group" aria-label="入力する記号"><button type="button" data-mode="available">○ 空き</button><button type="button" data-mode="tentative">△ 調整中</button><button type="button" data-mode="busy">× 不可</button><button type="button" data-mode="inherit">指定解除</button></div><div class="actions"><span id="change-count"></span><button id="undo" type="button">元に戻す</button><button id="discard" type="button">破棄</button><button id="publish" type="button" class="primary">公開する</button></div></div>
+    <div class="editor-bar"><div class="modes" role="group" aria-label="入力する記号"><button type="button" data-mode="available">○ 空き</button><button type="button" data-mode="tentative">△ 調整中</button><button type="button" data-mode="busy">× 不可</button><button type="button" data-mode="unreflected">— 未反映</button><button type="button" data-mode="inherit">指定解除</button></div><div class="actions"><span id="change-count"></span><button id="undo" type="button">元に戻す</button><button id="discard" type="button">破棄</button><button id="publish" type="button" class="primary">公開する</button></div></div>
     <p id="message" role="status" aria-live="polite"></p>
     <nav class="range-nav" aria-label="表示期間"><button type="button" id="prev">← 前の4週間</button><span id="visible-range"></span><label>年月へ移動 <input type="month" id="jump-month" aria-label="表示する年月"></label><button type="button" id="current">今日から8週間</button><button type="button" id="next">次の4週間 →</button></nav>
     <details class="tools"><summary>まとめて変更</summary><form id="batch"><div class="fields"><label>開始日<input type="date" name="from" required></label><label>終了日<input type="date" name="to" required></label><fieldset><legend>曜日</legend><div class="checks" id="weekdays"></div></fieldset><fieldset><legend>時間帯</legend><div class="checks" id="parts"></div></fieldset><label class="check"><input type="checkbox" name="overwrite">個別指定も上書き</label></div><button type="submit">対象を確認して適用</button></form></details>
@@ -176,6 +177,7 @@ app.addEventListener("submit", event => {
   if (!validRange(from, to)) { message("開始日・終了日を366日以内で指定してください", true); return; }
   const days = allDates(from, to);
   if (form.id === "batch") {
+    if (mode === "inherit") { message("まとめて変更するには、○・△・×・—のいずれかを選んでください", true); return; }
     const weekdays = values.getAll("weekday").map(Number), parts = values.getAll("part"), overwrite = values.has("overwrite");
     if (!weekdays.length || !parts.length) { message("曜日と時間帯を選んでください", true); return; }
     const target = days.filter(day => weekdays.includes(date(day).getUTCDay()));

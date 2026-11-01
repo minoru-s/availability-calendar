@@ -1,5 +1,6 @@
 const PARTS = ["am", "pm", "night"];
-const STATUSES = ["available", "tentative", "busy"];
+const STATUSES = ["available", "tentative", "busy", "unreflected"];
+const UNREFLECTED_FROM = "2026-12-01";
 const ISO = /^\d{4}-\d{2}-\d{2}$/;
 const WEEK_MS = 86400000;
 const noCache = { "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" };
@@ -19,6 +20,22 @@ function dates(from, to, max = 366) {
   for (let time = first; time <= last; time += WEEK_MS) result.push(new Date(time).toISOString().slice(0, 10));
   return result;
 }
+function normalizeLegacy(data) {
+  if (data.statusVersion === 2) return data;
+  const rules = data.rules.flatMap(rule => {
+    if (rule.status !== "tentative" || rule.to < UNREFLECTED_FROM) return [rule];
+    if (rule.from >= UNREFLECTED_FROM) return [{ ...rule, status: "unreflected" }];
+    return [
+      { ...rule, to: "2026-11-30" },
+      { ...rule, from: UNREFLECTED_FROM, status: "unreflected" }
+    ];
+  });
+  const overrides = Object.fromEntries(Object.entries(data.overrides).map(([day, slots]) => [day,
+    day < UNREFLECTED_FROM ? slots : Object.fromEntries(Object.entries(slots).map(([part, value]) => [part, value === "tentative" ? "unreflected" : value]))
+  ]));
+  return { ...data, rules, overrides, statusVersion: 2 };
+}
+const readData = value => normalizeLegacy(JSON.parse(value));
 function validate(data) {
   if (!data || typeof data !== "object" || Array.isArray(data)) throw new Error("データ形式が正しくありません");
   const { rules, overrides, locations } = data;
@@ -34,12 +51,12 @@ function validate(data) {
   for (const [day, label] of Object.entries(locations)) {
     if (!Number.isFinite(dateValue(day)) || typeof label !== "string" || !label.trim() || label.length > 40 || /[\u0000-\u001f\u007f]/.test(label)) throw new Error("滞在場所が正しくありません");
   }
-  return { rules, overrides, locations };
+  return normalizeLegacy({ rules, overrides, locations, statusVersion: data.statusVersion });
 }
 function status(data, day, part) {
   if (data.overrides[day]?.[part]) return data.overrides[day][part];
   const weekday = new Date(`${day}T00:00:00Z`).getUTCDay();
-  let value = "tentative";
+  let value = day >= UNREFLECTED_FROM ? "unreflected" : "tentative";
   for (const rule of data.rules) if (day >= rule.from && day <= rule.to && rule.weekdays.includes(weekday) && rule.parts.includes(part)) value = rule.status;
   return value;
 }
@@ -121,7 +138,7 @@ export default {
     try {
       if (url.pathname === "/api/public" && request.method === "GET") {
         const days = dates(url.searchParams.get("from"), url.searchParams.get("to"));
-        const row = await current(env), data = JSON.parse(row.data);
+        const row = await current(env), data = readData(row.data);
         const result = days.map(day => ({ date: day, am: status(data, day, "am"), pm: status(data, day, "pm"), night: status(data, day, "night"), ...(data.locations[day] ? { location: data.locations[day] } : {}) }));
         return response({ version: row.version, publishedAt: row.published_at, legacyCheckedAt: row.legacy_checked_at, days: result }, 200, origin === env.PUBLIC_ORIGIN ? { "Access-Control-Allow-Origin": origin } : {});
       }
@@ -147,12 +164,12 @@ export default {
       if (url.pathname === "/admin/app.js" && request.method === "GET") return new Response(ADMIN_JS, { headers: { "Content-Type": "text/javascript; charset=utf-8", ...noCache } });
       if (url.pathname === "/api/admin/state" && request.method === "GET") {
         const row = await current(env);
-        return response({ version: row.version, publishedAt: row.published_at, legacyCheckedAt: row.legacy_checked_at, data: JSON.parse(row.data), canRestore: !!row.previous });
+        return response({ version: row.version, publishedAt: row.published_at, legacyCheckedAt: row.legacy_checked_at, data: readData(row.data), canRestore: !!row.previous });
       }
       if (url.pathname === "/api/admin/restore-preview" && request.method === "GET") {
         const row = await current(env);
         if (!row.previous) return response({ error: "復元できる公開版がありません" }, 404);
-        return response({ version: row.version, previousPublishedAt: row.previous_published_at, changeCount: changedSlots(JSON.parse(row.data), JSON.parse(row.previous)) });
+        return response({ version: row.version, previousPublishedAt: row.previous_published_at, changeCount: changedSlots(readData(row.data), readData(row.previous)) });
       }
       if (url.pathname === "/api/admin/publish" && request.method === "POST") {
         if (origin !== url.origin || request.headers.get("content-type")?.split(";")[0] !== "application/json") return response({ error: "送信元が正しくありません" }, 403);

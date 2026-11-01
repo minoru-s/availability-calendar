@@ -4,3 +4,5 @@
 .header-links button{border:0;background:none;color:var(--blue);padding:8px 0;font-size:14px}
 .login{max-width:440px;margin:12vh auto 0;padding:38px;border-radius:28px;background:rgba(255,255,255,.85);box-shadow:0 12px 40px rgba(37,55,83,.1)}
 .login h1{margin-bottom:12px}.login p{color:var(--muted);line-height:1.7}.login #google-button{margin-top:25px}.login #login-error{color:#a53840}
+.slot.unreflected{background:#eff1f4;color:#65717f}
+@media(max-width:680px){.modes{grid-template-columns:repeat(4,minmax(0,1fr))}.modes [data-mode="inherit"]{grid-column:1/-1}}

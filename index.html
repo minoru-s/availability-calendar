@@ -8,10 +8,10 @@
   <meta name="description" content="午前・午後・夜ごとの空き状況。">
   <title>空き状況</title>
   <link rel="icon" type="image/svg+xml" href="./favicon.svg">
-  <link rel="stylesheet" href="./styles.css?v=20260928-location-layout">
+  <link rel="stylesheet" href="./styles.css?v=20261101-unreflected">
   <script src="./config.js" defer></script>
   <script src="./data.js?v=20260925-oct10-all" defer></script>
-  <script src="./app.js?v=20260928-simple-nav" defer></script>
+  <script src="./app.js?v=20261101-unreflected" defer></script>
 </head>
 <body>
   <main class="site-shell">
@@ -28,9 +28,10 @@
     <div class="review-notice" id="review-notice" role="note" hidden><span class="notice-dot" aria-hidden="true"></span><p><strong>公開前の確認用です。</strong>空き状況は下案です。</p></div>
     <div class="calendar-toolbar">
       <div class="legend" aria-label="記号の意味">
-        <span><b class="symbol available">○</b> 空き</span>
+        <span aria-label="○ 空き"><b class="symbol available">○</b><span class="legend-full">空き</span><span class="legend-short" aria-hidden="true">空き</span></span>
         <span aria-label="△ 調整中"><b class="symbol tentative">△</b><span class="legend-full">調整中</span><span class="legend-short" aria-hidden="true">調整</span></span>
         <span aria-label="× 予定あり"><b class="symbol busy">×</b><span class="legend-full">予定あり</span><span class="legend-short" aria-hidden="true">予定</span></span>
+        <span aria-label="— 未反映"><b class="symbol unreflected">—</b><span class="legend-full">未反映</span><span class="legend-short" aria-hidden="true">未入力</span></span>
       </div>
       <div class="toolbar-actions">
         <button class="today-button" id="go-today" type="button">今日</button>
@@ -38,7 +39,7 @@
       </div>
       <section class="calendar-help" id="calendar-help" aria-label="使い方と時間帯" hidden>
         <div class="help-heading"><h2>カレンダーの見方</h2><button class="help-close" id="close-help" type="button" aria-label="案内を閉じる">×</button></div>
-        <p>○・△を選ぶと候補をコピーできます。<br>空き状況は変わる場合があります。</p>
+        <p>○は空き、△は調整中、×は予定あり、—はまだ予定を反映していない時間帯です。○・△・—を選ぶと候補をコピーできます。未反映の候補は、日程を決める前に確認してください。</p>
         <dl class="help-times"><div><dt>午前</dt><dd>9–12時</dd></div><div><dt>午後</dt><dd>13–18時</dd></div><div><dt>夜</dt><dd>18–21時</dd></div></dl>
       </section>
     </div>

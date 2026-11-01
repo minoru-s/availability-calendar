@@ -6,12 +6,13 @@
   let rangeOffset = 0;
   const parts = ["am", "pm", "night"];
   const partLabels = { am: "午前", pm: "午後", night: "夜" };
-  const statusLabels = { available: "空き", tentative: "調整中", busy: "予定あり" };
+  const statusLabels = { available: "空き", tentative: "調整中", busy: "予定あり", unreflected: "未反映" };
   // Shared geometry avoids font-dependent symbol sizing and baseline offsets.
   const markPaths = {
     available: '<circle cx="12" cy="12" r="9"/>',
     tentative: '<path d="M12 3 22 21H2Z"/>',
-    busy: '<path d="m3.5 3.5 17 17m0-17-17 17"/>'
+    busy: '<path d="m3.5 3.5 17 17m0-17-17 17"/>',
+    unreflected: '<path d="M4 12h16"/>'
   };
   function markIcon(status) {
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + markPaths[status] + '</svg>';
@@ -83,7 +84,7 @@
     return (d.getUTCMonth() + 1) + "月" + d.getUTCDate() + "日（" + weekdays[d.getUTCDay()] + "）";
   }
   function statusOf(iso, part) {
-    if (apiDays) return apiDays.get(iso)?.[part] ?? "tentative";
+    if (apiDays) return apiDays.get(iso)?.[part] ?? (iso >= "2026-12-01" ? "unreflected" : "tentative");
     const override = data.slots[iso]?.[part];
     if (override) return override;
     const weekday = dateOf(iso).getUTCDay();
@@ -171,7 +172,8 @@
   async function copySelection() {
     const lines = [...selected].sort().map(key => {
       const [iso, part] = key.split(":");
-      return "・" + labelOf(iso) + " " + partLabels[part] + (selectedStatuses.get(key) === "tentative" ? "（調整中）" : "");
+      const status = selectedStatuses.get(key);
+      return "・" + labelOf(iso) + " " + partLabels[part] + (status === "tentative" ? "（調整中）" : status === "unreflected" ? "（未反映）" : "");
     });
     const value = "日程の候補です。\n" + lines.join("\n") + "\n\n最終的な日程はご連絡のうえ決められればと思います。";
     let ok = false;
