@@ -118,7 +118,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--blue);outline-offse
 }
 @media(prefers-contrast:more){.day-card.is-today{box-shadow:inset 0 0 0 3px var(--blue)}.today-button{border-color:var(--blue)}}
 
-/* One row stays visible; the explanation opens only when requested. */
+/* Keep the toolbar compact; the legend uses two rows on narrow screens. */
 .calendar-toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:nowrap;gap:16px;padding:8px 14px;border-radius:32px}
 .calendar-toolbar .legend{gap:20px;flex-wrap:nowrap;min-width:0}
 .calendar-toolbar .legend>span{gap:6px;line-height:1.4}
@@ -137,9 +137,14 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--blue);outline-offse
 .help-times dt{color:var(--secondary);margin-bottom:5px}.help-times dd{margin:0;font-weight:600;white-space:nowrap}
 @media(hover:hover){.help-button:hover,.help-close:hover{background:var(--line)}}
 @media(max-width:680px){.calendar-toolbar{padding:8px 10px;gap:10px}.calendar-toolbar .legend{gap:12px}.calendar-toolbar .legend>span{gap:4px}.calendar-toolbar .today-button{padding:8px 14px}.toolbar-actions{gap:10px}}
-@media(max-width:420px){.legend-full{display:none}.legend-short{display:inline}.calendar-toolbar .legend{gap:10px}.calendar-toolbar .legend>span{font-size:13px}.calendar-toolbar .symbol{width:22px;font-size:22px}.calendar-toolbar .today-button{padding:8px 12px}}
-@media(max-width:420px){.calendar-toolbar .legend-full,.calendar-toolbar .legend-short{display:none}.calendar-toolbar .legend{gap:8px}}
-@media(max-width:350px){.calendar-toolbar{gap:6px;padding:8px}.calendar-toolbar .legend{gap:6px}.calendar-toolbar .legend>span{gap:2px;font-size:12px}.calendar-toolbar .today-button{padding:8px 10px}.toolbar-actions{gap:8px}}
+@media(max-width:420px){
+  .calendar-toolbar .legend{display:grid;grid-template-columns:repeat(2,max-content);column-gap:10px;row-gap:2px}
+  .calendar-toolbar .legend>span{font-size:13px}
+  .calendar-toolbar .symbol{width:22px;height:22px;font-size:22px}
+  .calendar-toolbar .symbol svg{width:20px;height:20px}
+  .calendar-toolbar .today-button{padding:8px 12px}
+}
+@media(max-width:350px){.calendar-toolbar{gap:6px;padding:8px}.calendar-toolbar .legend{gap:6px}.calendar-toolbar .legend>span{gap:2px;font-size:13px}.calendar-toolbar .today-button{padding:8px 10px}.toolbar-actions{gap:8px}}
 @media(prefers-contrast:more){.calendar-help{border-color:var(--secondary)}}
 
 
